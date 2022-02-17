@@ -51,9 +51,9 @@ $(document).ready(function () {
         "iDisplayLength": 10,
         "order":[[0,"desc"]]  
     });
-        f = $("#formUsuario");
-        if(f){
-        f.submit(function (e) { 
+        formUsuario = $("#formUsuario");
+        if(formUsuario){
+        formUsuario.submit(function (e) { 
             e.preventDefault();
             let strIdentificacion = $('#txtIdentificacion').val();
             let strNombre = $('#txtNombre').val();
@@ -79,7 +79,6 @@ $(document).ready(function () {
             } 
             divLoading.css("display", "flex");
             formData = new FormData($("#formUsuario").get(0));
-            console.log("1");
             $.ajax({
                 type: "POST",
                 url: base_url + '/usuarios/setUsuario',
@@ -88,10 +87,8 @@ $(document).ready(function () {
                 contentType: false,
                 processData: false,
                 success: function (response) {
-                    console.log("1");
                     var myResponse = response.status;
                     if(myResponse){
-                        console.log("1");
                         if(rowTable == ""){
                             tableUsuarios.api().ajax.reload();
                         }else{
