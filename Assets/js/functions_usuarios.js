@@ -1,8 +1,7 @@
 let tableUsuarios;
 let rowTable = "";
-let divLoading = document.querySelector("#divLoading");
-document.addEventListener('DOMContentLoaded', function(){
-
+let divLoading = $("#divLoading");
+$(document).ready(function () {
     tableUsuarios = $('#tableUsuarios').dataTable( {
         "aProcessing":true,
         "aServerSide":true,
@@ -52,19 +51,18 @@ document.addEventListener('DOMContentLoaded', function(){
         "iDisplayLength": 10,
         "order":[[0,"desc"]]  
     });
-
-    if(document.querySelector("#formUsuario")){
-        let formUsuario = document.querySelector("#formUsuario");
-        formUsuario.onsubmit = function(e) {
+        formUsuarios = $("#formUsuario");
+        if(formUsuarios){
+        formUsuarios.submit(function (e) { 
             e.preventDefault();
-            let strIdentificacion = document.querySelector('#txtIdentificacion').value;
-            let strNombre = document.querySelector('#txtNombre').value;
-            let strApellido = document.querySelector('#txtApellido').value;
-            let strEmail = document.querySelector('#txtEmail').value;
-            let intTelefono = document.querySelector('#txtTelefono').value;
-            let intTipousuario = document.querySelector('#listRolid').value;
-            let strPassword = document.querySelector('#txtPassword').value;
-            let intStatus = document.querySelector('#listStatus').value;
+            let strIdentificacion = $('#txtIdentificacion').val();
+            let strNombre = $('#txtNombre').val();
+            let strApellido = $('#txtApellido').val();
+            let strEmail = $('#txtEmail').val();
+            let intTelefono = $('#txtTelefono').val();
+            let intTipousuario = $('#listRolid').val();
+            let strPassword = $('#txtPassword').val();
+            let intStatus = $('#listStatus').val();
 
             if(strIdentificacion == '' || strApellido == '' || strNombre == '' || strEmail == '' || intTelefono == '' || intTipousuario == '')
             {
@@ -72,24 +70,25 @@ document.addEventListener('DOMContentLoaded', function(){
                 return false;
             }
 
-            let elementsValid = document.getElementsByClassName("valid");
+            let elementsValid = $("valid");
             for (let i = 0; i < elementsValid.length; i++) { 
                 if(elementsValid[i].classList.contains('is-invalid')) { 
                     swal("Atención", "Por favor verifique los campos en rojo." , "error");
                     return false;
                 } 
             } 
-            divLoading.style.display = "flex";
-            let request = (window.XMLHttpRequest) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-            let ajaxUrl = base_url+'/Usuarios/setUsuario'; 
-            let formData = new FormData(formUsuario);
-            request.open("POST",ajaxUrl,true);
-            request.send(formData);
-            request.onreadystatechange = function(){
-                if(request.readyState == 4 && request.status == 200){
-                    let objData = JSON.parse(request.responseText);
-                    if(objData.status)
-                    {
+            divLoading.css("display", "flex");
+            formData = new FormData($("#formUsuario").get(0));
+            $.ajax({
+                type: "POST",
+                url: base_url + '/usuarios/setUsuario',
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    var myResponse = response.status;
+                    if(myResponse){
                         if(rowTable == ""){
                             tableUsuarios.api().ajax.reload();
                         }else{
@@ -106,15 +105,15 @@ document.addEventListener('DOMContentLoaded', function(){
                         }
                         $('#modalFormUsuario').modal("hide");
                         formUsuario.reset();
-                        swal("Usuarios", objData.msg ,"success");
+                        swal("Usuarios", response.msg ,"success");
                     }else{
-                        swal("Error", objData.msg , "error");
+                        swal("Error", response.msg , "error");
                     }
-                }
-                divLoading.style.display = "none";
-                return false;
-            }
-        }
+                    divLoading.css("display", "none");
+                    return false;
+                }   
+            });
+        });
     }
     //Actualizar Perfil
     if(document.querySelector("#formPerfil")){
@@ -233,8 +232,7 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         }
     }
-}, false);
-
+});
 
 window.addEventListener('load', function() {
         fntRolesUsuario();
